@@ -13,7 +13,7 @@ const Signup: React.FC = (): JSX.Element => {
     const [ passwordError, setPasswordError ] = useState<boolean>(false);
     const [ userError, setUserError ] = useState<boolean>(false);
 
-    function handleLogin(e: SyntheticEvent){
+    function handleSignup(e: SyntheticEvent){
         e.preventDefault();
         if(checkEmail() && checkPassword() && checkUserName()){
             console.log(email);
@@ -24,17 +24,15 @@ const Signup: React.FC = (): JSX.Element => {
     function checkPassword(): boolean {
         return checkEmptyInput(password, setPasswordError, setPasswordErrorMessage, "Password");
     }
-
     function checkUserName(): boolean {
         return checkEmptyInput(userName, setUserError, setUserErrorMessage, "User Name");
     }
-
     function checkEmail(): boolean {
         return checkEmailInput(email, setEmailError, setEmailErrorMessage);
     }
 
     return <>
-        <Paper component="form" elevation={5} onSubmit={handleLogin} >
+        <Paper component="form" elevation={5} onSubmit={handleSignup} >
 
             <TextField id="userName" label="User Name" variant="outlined" value={userName} onChange={(e) => setUserName(e.target.value)} error={userError} helperText={userErrorMessage} onBlur={checkUserName} />
 
