@@ -5,7 +5,7 @@ const Video: React.FC<VideoProps> = ({ peer }: VideoProps): JSX.Element => {
     const ref = useRef<HTMLVideoElement | null>(null);
 
     useEffect(() => {
-        peer.on("stream", stream => {
+        peer.peer.on("stream", stream => {
             if(ref.current)
                 ref.current.srcObject = stream;
         })

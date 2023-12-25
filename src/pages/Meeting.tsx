@@ -5,7 +5,7 @@ import { Peers, SignalData } from "../types/MeetingTypes";
 import Video from "../components/Video";
 
 const Meeting: React.FC = (): JSX.Element => {
-    const [peers, setPeers] = useState<SimplePeerInstance[]>([]);
+    const [peers, setPeers] = useState<Peers[]>([]);
     const userVideo = useRef<HTMLVideoElement | null>(null);
     const peersRef = useRef<Peers[]>([]);
     const ws: WebSocket = useMemo(() => new WebSocket('ws://localhost:3001'), []);
@@ -22,14 +22,19 @@ const Meeting: React.FC = (): JSX.Element => {
     }
 
     function createPeerConnections(users: string[]){
-        const peers: SimplePeerInstance[] = [];
+        const peers: Peers[] = [];
         users.forEach(userToConnect => {
             const peer = createPeer(userToConnect, userId, userVideo.current?.srcObject);
             peersRef.current.push({
                 peerID: userToConnect,
                 peer,
+                connected: true
             })
-            peers.push(peer);
+            peers.push({
+                peerID: userToConnect,
+                peer,
+                connected: true
+            });
         })
         setPeers(peers);
     }
@@ -39,8 +44,13 @@ const Meeting: React.FC = (): JSX.Element => {
         peersRef.current.push({
             peerID: signalData.userId,
             peer,
+            connected: true
         })
-        setPeers(users => [...users, peer]);
+        setPeers(users => [...users, {
+            peerID: signalData.userId,
+            peer,
+            connected: true
+        }]);
     }
 
     function createPeerWithUserInMeeting(signalData: SignalData){
@@ -77,6 +87,20 @@ const Meeting: React.FC = (): JSX.Element => {
 
         return peer;
     }
+
+    function removeUser(userIdToRemove: string){
+        peersRef.current = peersRef.current.filter(peer => peer.peerID !== userIdToRemove);
+        setPeers(peers => {
+            const newPeers = [...peers];
+            newPeers.forEach(newPeer => {
+                if(newPeer.peerID === userIdToRemove){
+                    newPeer.connected = false;
+                }
+            })
+            return newPeers;
+        })
+    }
+
     function wsEventHandler(eventData: MessageEvent){
         const eventName: string = JSON.parse(eventData.data).event
         switch(eventName){
@@ -91,6 +115,14 @@ const Meeting: React.FC = (): JSX.Element => {
             case "get-signal-from-users-in-meeting":
                 const signalDataFromUserInMeeting: SignalData = JSON.parse(eventData.data).signalData
                 createPeerWithUserInMeeting(signalDataFromUserInMeeting);
+                break;
+            case "remove-user":
+                const userIdToRemove: string = JSON.parse(eventData.data).userId
+                removeUser(userIdToRemove)
+                break;
+            default:
+                console.log(eventName);
+                
         }
     }
 
@@ -99,6 +131,9 @@ const Meeting: React.FC = (): JSX.Element => {
         getMyStreamAndJoinRoom(ws)
 
         return () => {
+            peers.forEach((peer) => {
+                peer.peer.destroy()
+            })
             ws.removeEventListener("message", wsEventHandler);
         }
     }, []);
@@ -109,7 +144,7 @@ const Meeting: React.FC = (): JSX.Element => {
             {
                 peers.map((peer, index) => {
                     return (
-                        <Video key={index} peer={peer} />
+                        peer.connected && <Video key={index} peer={peer} />
                     );
                 })
             }

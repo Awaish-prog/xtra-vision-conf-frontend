@@ -1,6 +1,5 @@
 import React from "react"
-import { Meeting } from "./MeetingTypes"
-import { Instance as SimplePeerInstance } from 'simple-peer';
+import { Meeting, Peers } from "./MeetingTypes"
 
 export type MeetingOptionProps = {
     icon: React.ElementType,
@@ -12,5 +11,5 @@ export type MeetingCardProps = {
 }
 
 export type VideoProps = {
-    peer: SimplePeerInstance
+    peer: Peers
 }

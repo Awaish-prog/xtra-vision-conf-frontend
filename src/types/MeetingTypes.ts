@@ -9,7 +9,8 @@ export type Meeting = {
 
 export type Peers = {
     peerID: string,
-    peer: SimplePeerInstance
+    peer: SimplePeerInstance,
+    connected: boolean
 }
 
 export type SignalData = {
