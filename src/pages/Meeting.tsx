@@ -1,15 +1,14 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import Peer, { Instance as SimplePeerInstance } from 'simple-peer';
-import { Paper } from "@mui/material";
+import React, { useEffect, useRef, useState } from "react";
+import Peer from 'simple-peer';
+import { Container, Paper } from "@mui/material";
 import { Peers, SignalData } from "../types/MeetingTypes";
 import Video from "../components/Video";
+import { MeeetingProps } from "../types/PropTypes";
 
-const Meeting: React.FC = (): JSX.Element => {
+const Meeting: React.FC<MeeetingProps> = ({ ws, roomId }: MeeetingProps): JSX.Element => {
     const [peers, setPeers] = useState<Peers[]>([]);
     const userVideo = useRef<HTMLVideoElement | null>(null);
     const peersRef = useRef<Peers[]>([]);
-    const ws: WebSocket = useMemo(() => new WebSocket('ws://localhost:3001'), []);
-    const roomID = "1234";
     const userId: string = window.location.href;
 
     function getMyStreamAndJoinRoom(ws: WebSocket){
@@ -17,7 +16,7 @@ const Meeting: React.FC = (): JSX.Element => {
             if(userVideo.current){
                 userVideo.current.srcObject = stream;
             }
-            ws.send(JSON.stringify({ event: "join-room", data: { roomId: roomID, userId: userId } }));
+            ws.send(JSON.stringify({ event: "join-room", data: { roomId: roomId, userId: userId } }));
         })
     }
 
@@ -120,6 +119,10 @@ const Meeting: React.FC = (): JSX.Element => {
                 const userIdToRemove: string = JSON.parse(eventData.data).userId
                 removeUser(userIdToRemove)
                 break;
+            case "get-timer":
+                const timer: number = JSON.parse(eventData.data).timer;
+                console.log(timer);
+                break;
             default:
                 console.log(eventName);
                 
@@ -140,6 +143,7 @@ const Meeting: React.FC = (): JSX.Element => {
 
     return <>
         <Paper>
+            <Container>
             <video playsInline autoPlay ref={userVideo} />
             {
                 peers.map((peer, index) => {
@@ -148,6 +152,7 @@ const Meeting: React.FC = (): JSX.Element => {
                     );
                 })
             }
+            </Container>
         </Paper>
     </>
 }

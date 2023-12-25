@@ -4,15 +4,18 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import Meeting from './pages/Meeting';
+import MeetingPage from './pages/MeetingPage';
 
 function App() {
   return (
+    <>
     <Routes>
       <Route path = "/" element = {<Login />} />
       <Route path = "/signup" element = {<Signup />} />
       <Route path = "/meetings" element = {<Dashboard />} />
-      <Route path = "/join-meeting*" element = {<Meeting />} />
+      <Route path = "/join-meeting*" element = {<MeetingPage />} />
     </Routes>
+    </>
   );
 }
 

@@ -13,3 +13,18 @@ export type MeetingCardProps = {
 export type VideoProps = {
     peer: Peers
 }
+
+export type VideosProps = {
+    userVideo: any,
+    peers: Peers[]
+}
+
+export type TimerProps = {
+    timers: number[],
+    sendTimer: { (timer: number): void }
+}
+
+export type MeeetingProps = {
+    ws: WebSocket,
+    roomId: string
+}
