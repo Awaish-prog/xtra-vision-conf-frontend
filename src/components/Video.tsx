@@ -13,7 +13,7 @@ const Video: React.FC<VideoProps> = ({ peer }: VideoProps): JSX.Element => {
     }, []);
 
     return (
-        <video playsInline autoPlay ref={ref} />
+        <video playsInline autoPlay ref={ref} muted = {!peer.audioOn} width = {peer.videoOn ? '500px' : '0px'} />
     );
 }
 

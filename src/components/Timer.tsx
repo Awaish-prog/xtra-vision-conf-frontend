@@ -1,16 +1,10 @@
-import { Button, Container } from "@mui/material";
-import React from "react";
-import { TimerProps } from "../types/PropTypes";
+import { Container } from '@mui/material'
+import React from 'react'
 
-const Timer: React.FC<TimerProps> = ({ timers, sendTimer }: TimerProps): JSX.Element => {
+const Timer: React.FC<{timer: number}> = ({ timer }: {timer: number}): JSX.Element => {
     return <Container>
-    {
-        timers.map((timer, index) => {
-            return <Button key={index} onClick={() => sendTimer(timer)} >{timer}</Button>
-        })
-    }
+        { timer >= -2 && <p>{timer > 0 ? timer : "Time over"}</p>}
     </Container>
 }
 
 export default Timer;
-// onClick={() => sendTimer(timer)}

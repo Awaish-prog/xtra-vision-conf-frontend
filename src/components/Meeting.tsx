@@ -2,12 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 import Peer from 'simple-peer';
 import { Container, Paper } from "@mui/material";
 import { Peers, SignalData } from "../types/MeetingTypes";
-import Video from "../components/Video";
+import Video from "./Video";
 import { MeeetingProps } from "../types/PropTypes";
 
-const Meeting: React.FC<MeeetingProps> = ({ ws, roomId }: MeeetingProps): JSX.Element => {
+const Meeting: React.FC<MeeetingProps> = ({ ws, roomId, userVideo, myVideoOn, myAudioOn, startTimer }: MeeetingProps): JSX.Element => {
     const [peers, setPeers] = useState<Peers[]>([]);
-    const userVideo = useRef<HTMLVideoElement | null>(null);
     const peersRef = useRef<Peers[]>([]);
     const userId: string = window.location.href;
 
@@ -27,12 +26,16 @@ const Meeting: React.FC<MeeetingProps> = ({ ws, roomId }: MeeetingProps): JSX.El
             peersRef.current.push({
                 peerID: userToConnect,
                 peer,
-                connected: true
+                connected: true,
+                videoOn: true,
+                audioOn: true,
             })
             peers.push({
                 peerID: userToConnect,
                 peer,
-                connected: true
+                connected: true,
+                videoOn: true,
+                audioOn: true,
             });
         })
         setPeers(peers);
@@ -43,12 +46,16 @@ const Meeting: React.FC<MeeetingProps> = ({ ws, roomId }: MeeetingProps): JSX.El
         peersRef.current.push({
             peerID: signalData.userId,
             peer,
-            connected: true
+            connected: true,
+            videoOn: true,
+            audioOn: true,
         })
         setPeers(users => [...users, {
             peerID: signalData.userId,
             peer,
-            connected: true
+            connected: true,
+            videoOn: true,
+            audioOn: true
         }]);
     }
 
@@ -100,6 +107,30 @@ const Meeting: React.FC<MeeetingProps> = ({ ws, roomId }: MeeetingProps): JSX.El
         })
     }
 
+    function turnOffVideo(userId: string, turnOnVideo: boolean){
+        setPeers(peers => {
+            const newPeers = [...peers];
+            newPeers.forEach(peer => {
+                if(peer.peerID === userId){
+                    peer.videoOn = turnOnVideo
+                }
+            })
+            return newPeers
+        })
+    }
+
+    function turnOffMic(userId: string, turnOnMic: boolean){
+        setPeers(peers => {
+            const newPeers = [...peers];
+            newPeers.forEach(peer => {
+                if(peer.peerID === userId){
+                    peer.audioOn = turnOnMic
+                }
+            })
+            return newPeers
+        })
+    }
+
     function wsEventHandler(eventData: MessageEvent){
         const eventName: string = JSON.parse(eventData.data).event
         switch(eventName){
@@ -121,7 +152,17 @@ const Meeting: React.FC<MeeetingProps> = ({ ws, roomId }: MeeetingProps): JSX.El
                 break;
             case "get-timer":
                 const timer: number = JSON.parse(eventData.data).timer;
-                console.log(timer);
+                startTimer(timer)
+                break;
+            case "turn-off-camera":
+                const userIdVideoOff: string = JSON.parse(eventData.data).userId
+                const turnOnVideo: boolean = JSON.parse(eventData.data).turnOn
+                turnOffVideo(userIdVideoOff, turnOnVideo);
+                break;
+            case "turn-off-mic":
+                const userIdMicOff: string = JSON.parse(eventData.data).userId
+                const turnOnMic: boolean = JSON.parse(eventData.data).turnOn
+                turnOffMic(userIdMicOff, turnOnMic);
                 break;
             default:
                 console.log(eventName);
@@ -144,7 +185,7 @@ const Meeting: React.FC<MeeetingProps> = ({ ws, roomId }: MeeetingProps): JSX.El
     return <>
         <Paper>
             <Container>
-            <video playsInline autoPlay ref={userVideo} />
+            <video playsInline autoPlay ref={userVideo} muted={!myAudioOn} width={myVideoOn ? '500px' : '0px'} />
             {
                 peers.map((peer, index) => {
                     return (

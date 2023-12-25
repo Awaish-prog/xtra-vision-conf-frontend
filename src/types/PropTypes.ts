@@ -26,5 +26,9 @@ export type TimerProps = {
 
 export type MeeetingProps = {
     ws: WebSocket,
-    roomId: string
+    roomId: string,
+    userVideo: any,
+    myVideoOn: boolean,
+    myAudioOn: boolean,
+    startTimer: { (timer: number): void }
 }

@@ -1,23 +1,62 @@
-import React, { useMemo } from "react";
-import Meeting from "./Meeting";
-import { Container } from "@mui/material";
+import React, { useMemo, useRef, useState } from "react";
+import Meeting from "../components/Meeting";
+import { Button, Container } from "@mui/material";
+import Timers from "../components/Timers";
 import Timer from "../components/Timer";
 
 
 const MeetingPage: React.FC = (): JSX.Element => {
-    const timers: number[] = useMemo(() => [15, 30, 45, 60], []);
+    const [ myVideoOn, setMyVideoOn ] = useState<boolean>(true);
+    const [ myAudioOn, setMyAudioOn ] = useState<boolean>(true);
+    const timers: number[] = [15, 30, 45, 60]
+    const [ timer, setTimer ] = useState<number>(-3)
+    let interval: number = useMemo(() => 0, [])
     const ws: WebSocket = useMemo(() => new WebSocket('ws://localhost:3001'), []);
+    const userVideo = useRef<HTMLVideoElement | null>(null);
     const roomId = "1234";
 
     function sendTimer(timer: number){
         ws.send(JSON.stringify({event: "send-timer", data: { timer, roomId}}));
     }
 
+    function toggleCamera(){
+        ws.send(JSON.stringify({event: "turn-camera-off", data: { userId: window.location.href, roomId, turnOn: !myVideoOn}}))
+        setMyVideoOn(prev => !prev)
+    }
+
+    function toggleMic(){
+        ws.send(JSON.stringify({event: "turn-mic-off", data: { userId: window.location.href, roomId, turnOn: !myAudioOn}}))
+        setMyAudioOn(prev => !prev)
+    }
+
+    function startTimer(seconds: number){
+        clearInterval(interval);
+        let time: number = seconds;
+        interval = window.setInterval(() => {
+            setTimer(prev => {
+                if(seconds){
+                    seconds = 0;
+                    return time;
+                }
+                else{
+                    time -= 1;
+                    return prev - 1;
+                }
+            })
+            if(time === -3){
+                clearInterval(interval);
+            }
+        }, 1000)
+    }
+
     return <>
+        <Timer timer= {timer} />
+        <Meeting ws = {ws} roomId={roomId} userVideo={userVideo} myVideoOn={myVideoOn} myAudioOn={myAudioOn} startTimer={startTimer} />
+        <Button onClick={toggleCamera} >toggle camera</Button>
+        <Button onClick={toggleMic} >toggle mic</Button>
         <Container>
-            <Timer timers={timers} sendTimer={sendTimer} />
+            <Timers timers={timers} sendTimer={sendTimer} />
         </Container>
-        <Meeting ws = {ws} roomId={roomId} />
     </>
 }
 
