@@ -4,6 +4,7 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import { checkEmailInput, checkEmptyInput } from "../utils/InputValidation";
 import { loginUserApi } from "../apis/UserApis";
+import { useNavigate } from "react-router-dom";
 
 
 const Login: React.FC = (): JSX.Element => {
@@ -13,12 +14,18 @@ const Login: React.FC = (): JSX.Element => {
     const [ passwordErrorMessage, setPasswordErrorMessage ] = useState<string>("");
     const [ emailError, setEmailError ] = useState<boolean>(false);
     const [ passwordError, setPasswordError ] = useState<boolean>(false);
+    const navigate = useNavigate();
 
     async function handleLogin(e: SyntheticEvent){
         e.preventDefault();
         if(checkEmail() && checkPassword()){
             const response = await loginUserApi(password, email);
-            console.log(response);          
+            if(response.data && response.data.status === 200){
+                localStorage.setItem('email', response.data.data.email);
+                localStorage.setItem('token', response.data.data.token);
+                localStorage.setItem('userId', response.data.data.id);
+                navigate("/meetings")
+            }
         }
     }
     function checkPassword(): boolean {

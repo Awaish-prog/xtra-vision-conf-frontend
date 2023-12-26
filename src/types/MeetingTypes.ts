@@ -4,7 +4,8 @@ export type Meeting = {
     id: number,
     title: string,
     host: string,
-    dateTime: string
+    dateTime: string,
+    _id?: any
 }
 
 export type Peers = {

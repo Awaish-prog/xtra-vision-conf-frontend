@@ -2,6 +2,7 @@ import React, { SyntheticEvent, useState } from "react";
 import { checkEmailInput, checkEmptyInput } from "../utils/InputValidation";
 import { Button, Paper, TextField } from "@mui/material";
 import { signUpUserApi } from "../apis/UserApis";
+import { useNavigate } from "react-router-dom";
 
 const Signup: React.FC = (): JSX.Element => {
     const [ email, setEmail ] = useState<string>("");
@@ -13,11 +14,18 @@ const Signup: React.FC = (): JSX.Element => {
     const [ emailError, setEmailError ] = useState<boolean>(false);
     const [ passwordError, setPasswordError ] = useState<boolean>(false);
     const [ userError, setUserError ] = useState<boolean>(false);
+    const navigate = useNavigate();
 
     async function handleSignup(e: SyntheticEvent){
         e.preventDefault();
         if(checkEmail() && checkPassword() && checkUserName()){
             const response = await signUpUserApi(userName, password, email);
+            if(response.data && response.data.status === 200){
+                localStorage.setItem('email', response.data.data.email);
+                localStorage.setItem('token', response.data.data.token);
+                localStorage.setItem('userId', response.data.data.id);
+                navigate("/meetings")
+            }
         }
     }
     function checkPassword(): boolean {

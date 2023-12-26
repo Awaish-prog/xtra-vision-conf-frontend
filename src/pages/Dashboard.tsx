@@ -1,113 +1,32 @@
 import { Container, Paper, Tabs, Tab } from "@mui/material";
-import VideocamIcon from '@mui/icons-material/Videocam';
-import AddIcon from '@mui/icons-material/Add';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import React, { useState } from "react";
-import MeetingOption from "../components/MettingOption";
+import React, { useEffect, useState } from "react";
 import MeetingCard from "../components/MeetingCard";
 import { Meeting } from "../types/MeetingTypes";
+import MeetingOptions from "../components/MeetingOptions";
+import { getMeetingsListApi } from "../apis/MeetingApis";
 
 const Dashboard: React.FC = (): JSX.Element => {
     const [ toggleMeetings, setToggleMeetings ] = useState<number>(0);
-    const [ upcomingMettings, setUpcomingMettings ] = useState<Meeting[]>([
-        {
-            id: 1,
-            title: "Title 1",
-            host: "Host 1",
-            dateTime: "12-12-12, 12:00 PM"
-        },
-        {
-            id: 2,
-            title: "Title 1",
-            host: "Host 1",
-            dateTime: "12-12-12, 12:00 PM"
-        },
-        {
-            id: 3,
-            title: "Title 1",
-            host: "Host 1",
-            dateTime: "12-12-12, 12:00 PM"
-        },
-        {
-            id: 4,
-            title: "Title 1",
-            host: "Host 1",
-            dateTime: "12-12-12, 12:00 PM"
-        },
-        {
-            id: 5,
-            title: "Title 1",
-            host: "Host 1",
-            dateTime: "12-12-12, 12:00 PM"
-        },
-        {
-            id: 6,
-            title: "Title 1",
-            host: "Host 1",
-            dateTime: "12-12-12, 12:00 PM"
-        },
-        {
-            id: 7,
-            title: "Title 1",
-            host: "Host 1",
-            dateTime: "12-12-12, 12:00 PM"
-        },
-    ])
+    const [ upcomingMettings, setUpcomingMettings ] = useState<Meeting[]>([])
+    const [ previousMettings, setPreviousMettings ] = useState<Meeting[]>([])
 
-    const [ previousMettings, setPreviousMettings ] = useState<Meeting[]>([
-        {
-            id: 1,
-            title: "Title 11",
-            host: "Host 1",
-            dateTime: "12-12-12, 12:00 PM"
-        },
-        {
-            id: 2,
-            title: "Title 12",
-            host: "Host 1",
-            dateTime: "12-12-12, 12:00 PM"
-        },
-        {
-            id: 3,
-            title: "Title 13",
-            host: "Host 1",
-            dateTime: "12-12-12, 12:00 PM"
-        },
-        {
-            id: 4,
-            title: "Title 14",
-            host: "Host 1",
-            dateTime: "12-12-12, 12:00 PM"
-        },
-        {
-            id: 5,
-            title: "Title 15",
-            host: "Host 1",
-            dateTime: "12-12-12, 12:00 PM"
-        },
-        {
-            id: 6,
-            title: "Title 16",
-            host: "Host 1",
-            dateTime: "12-12-12, 12:00 PM"
-        },
-        {
-            id: 7,
-            title: "Title 17",
-            host: "Host 1",
-            dateTime: "12-12-12, 12:00 PM"
-        },
-    ])
+    async function getMeetingsList(){
+        const response = await getMeetingsListApi();
+        if(response.data.status === 200){
+            setPreviousMettings(response.data.data.previousMeetings);
+            setUpcomingMettings(response.data.data.upcomingMeetings);
+        }
+    }
+
+    useEffect(() => {
+        getMeetingsList()
+    }, [])
 
     return <>
         <Paper>
             <h1>Meetings</h1>
             <Container>
-                <Container>
-                    <MeetingOption icon = {VideocamIcon} iconText = {"New meeting"} />
-                    <MeetingOption icon = {AddIcon} iconText = {"Join meeting"} />
-                    <MeetingOption icon = {CalendarMonthIcon} iconText = {"Schedule meeting"} />
-                </Container>
+                <MeetingOptions />
                 <Container>
                     <Tabs value={toggleMeetings}>
                         <Tab label = {"Upcoming Meetings"} onClick={() => setToggleMeetings(0)} />
