@@ -52,10 +52,11 @@ const Dashboard: React.FC = (): JSX.Element => {
             <div className="meetings-options-container">
                 <MeetingOptions addMeetingInUpcomingMeetings={addMeetingInUpcomingMeetings} />
                 <div className="meetings-container">
-                    <Tabs value={toggleMeetings}>
+                    <Tabs className="tabs" value={toggleMeetings}>
                         <Tab label = {"Upcoming Meetings"} onClick={() => setToggleMeetings(0)} />
                         <Tab label = {"Previous Meetings"} onClick={() => setToggleMeetings(1)} />
                     </Tabs>
+                    <div className="meetings-list-container">
                     {
                         toggleMeetings === 0 ?
                         upcomingMettings.map((upcomingMetting) => {
@@ -66,6 +67,7 @@ const Dashboard: React.FC = (): JSX.Element => {
                             return <MeetingCard meeting = {previousMetting} />
                         })
                     }
+                    </div>
                 </div>
             </div>
         </Paper>

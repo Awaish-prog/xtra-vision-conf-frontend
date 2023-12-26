@@ -3,30 +3,34 @@
     width: 98%;
     display: flex;
     flex-direction: column;
+    overflow-y: hidden;
 }
 
 .dashboard-header {
     display: flex;
     justify-content: space-between;
     padding: 15px 2%;
+    margin-top: 20px;
 }
 .meetings-options-container {
     display: flex;
     justify-content: space-around;
-    align-items: center;
+    align-items: start;
     width: 100%;
-    height: 100%;
+    height: 90%;
 }
 .meeting-options-container {
-    width: 20%;
-    border: 1px solid gray;
+    width: 30%;
     height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
+    border-top: 1px solid rgb(221, 227, 237);
 }
 .meetings-container {
-    width: 80%;
+    width: 100%;
+    height: 100%;
+    border-left: 1px solid rgb(221, 227, 237);
 }
 .create-meeting-options {
     width: 80%;
@@ -45,4 +49,55 @@
 }
 .create-meeting-option {
     width: 100%;
+}
+.meetings-list-container {
+    overflow-y: scroll;
+    max-height: 80%;
+    display: flex;
+    flex-wrap: wrap;
+}
+.meeting-card {
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1 1 calc(40% - 2%);
+    width: 40%;
+    max-width: 400px;
+    min-width: 150px;
+    margin: 10px;
+    box-sizing: border-box;
+}
+.meeting-card > h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    padding: 10px;
+}
+.meeting-card > button {
+    width: fit-content;
+}
+.meeting-card > p {
+    margin: 0;
+    font-size: smaller;
+    padding: 5px;
+}
+.tabs {
+    background-color: rgb(221, 227, 237);
+    color: white;
+}
+
+@media (max-width: 1000px) {
+    .meetings-options-container{
+        flex-direction: column;
+    }
+    .meeting-options-container {
+        flex-direction: row;
+        width: 100%;
+    }
+    .create-meeting-options {
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+    }
 }

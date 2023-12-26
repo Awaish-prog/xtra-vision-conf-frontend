@@ -63,12 +63,13 @@ const MeetingOptions: React.FC<{addMeetingInUpcomingMeetings: Function}> = ({ ad
     }
 
     return <div className="meeting-options-container">
-            <Dialog open={open} onClose={handleClose}>
+            <Dialog open={open} onClose={handleClose} scroll="body" PaperProps={{ sx: { mt: "10px", verticalAlign: "top", width: '40vw' } }}>
                 <DialogTitle>Create Meeting</DialogTitle>
                 <DialogContent>
-                    <TextField autoFocus margin="dense" id="title" label="Meeting Title" type="text" fullWidth variant="standard" value={title} onChange={e => setTitle(e.target.value)} error={titleError} helperText={titleErrorMessage} onBlur={validateTitle} />
-                    
+                    <p></p>
                     {openDate && <DateTimePicker label="Meeting Date" value={date} onChange={(newValue) => setDate(newValue)} disablePast />}
+                    <p></p>
+                    <TextField autoFocus margin="dense" id="title" label="Meeting Title" type="text" fullWidth variant="standard" value={title} onChange={e => setTitle(e.target.value)} error={titleError} helperText={titleErrorMessage} onBlur={validateTitle} />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>Cancel</Button>
