@@ -5,16 +5,12 @@ html, body, #root {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  margin: 0;
   box-sizing: border-box;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 0;
-}
-
-body {
-  overflow: scroll;
+  overflow-x: hidden;
 }
 
 code {

@@ -11,7 +11,8 @@ export type MeetingCardProps = {
 }
 
 export type VideoProps = {
-    peer: Peers
+    peer: Peers,
+    hostId: string
 }
 
 export type VideosProps = {
@@ -31,5 +32,6 @@ export type MeeetingProps = {
     userVideo: any,
     myVideoOn: boolean,
     myAudioOn: boolean,
+    hostId: string,
     startTimer: { (timer: number): void }
 }

@@ -33,4 +33,11 @@ async function getMeetingsListApi(){
     return response
 }
 
-export { createNewMeetingApi, getMeetingsListApi };
+async function getHostIdApi(roomId: string | null){
+    const response = axios.post(`${apiUrl}get-host-id`, {
+        roomId
+    })
+    return response; 
+}
+
+export { createNewMeetingApi, getMeetingsListApi, getHostIdApi };

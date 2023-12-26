@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import Peer from 'simple-peer';
-import { Container, Paper } from "@mui/material";
 import { Peers, SignalData } from "../types/MeetingTypes";
 import Video from "./Video";
 import { MeeetingProps } from "../types/PropTypes";
+import avatar from "../assets/avatar.png";
+import "../styles/MeetingDashboard.css";
 
-const Meeting: React.FC<MeeetingProps> = ({ ws, roomId, userId, userVideo, myVideoOn, myAudioOn, startTimer }: MeeetingProps): JSX.Element => {
+const Meeting: React.FC<MeeetingProps> = ({ ws, roomId, userId, userVideo, myVideoOn, myAudioOn, hostId, startTimer }: MeeetingProps): JSX.Element => {
     const [peers, setPeers] = useState<Peers[]>([]);
     const peersRef = useRef<Peers[]>([]);
 
@@ -134,9 +135,8 @@ const Meeting: React.FC<MeeetingProps> = ({ ws, roomId, userId, userVideo, myVid
         const eventName: string = JSON.parse(eventData.data).event
         switch(eventName){
             case "get-all-users":
-                const { usersInRoom, timerInit }: { usersInRoom: string[], timerInit: number } = JSON.parse(eventData.data);                
+                const { usersInRoom }: { usersInRoom: string[], timerInit: number } = JSON.parse(eventData.data);                
                 createPeerConnections(usersInRoom);
-                // startTimer(timerInit)
                 break;
             case "new-user-joined":
                 const signalData: SignalData = JSON.parse(eventData.data).signalData
@@ -170,11 +170,10 @@ const Meeting: React.FC<MeeetingProps> = ({ ws, roomId, userId, userVideo, myVid
                 
         }
     }
-
+    console.log(peers.filter(peer => peer.peerID === hostId).length);
     useEffect(() => {
         ws.addEventListener('message', wsEventHandler)
         getMyStreamAndJoinRoom(ws)
-
         return () => {
             peers.forEach((peer) => {
                 peer.peer.destroy()
@@ -183,20 +182,32 @@ const Meeting: React.FC<MeeetingProps> = ({ ws, roomId, userId, userVideo, myVid
         }
     }, []);
 
-    return <>
-        <Paper>
-            <Container>
-            <video playsInline autoPlay ref={userVideo} muted={!myAudioOn} width={myVideoOn ? '500px' : '0px'} />
+    return <div className="conf-div">
+            <video playsInline autoPlay ref={userVideo} muted={!myAudioOn} style={{
+                position: 'absolute',
+                bottom: '10px',
+                right: '25px'
+            }} width={myVideoOn ? '250px' : '0px'} />
+            <div style= {{
+                position: 'absolute',
+                bottom: '10px',
+                right: '25px',
+                width: myVideoOn ? '0px' : '250px',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                border: '1px solid gray'
+            }} ><img width={myVideoOn ? '0px' : '200px'} height={'170px'} src = {avatar} alt="avatar" /></div>
+            <div className="participants-container">
             {
                 peers.map((peer, index) => {
                     return (
-                        peer.connected && <Video key={index} peer={peer} />
+                        peer.connected && <Video key={index} hostId = {hostId} peer={peer} />
                     );
                 })
             }
-            </Container>
-        </Paper>
-    </>
+            </div>
+        </div>
 }
 
 export default Meeting;
