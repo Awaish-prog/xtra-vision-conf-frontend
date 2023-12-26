@@ -135,9 +135,9 @@ const Meeting: React.FC<MeeetingProps> = ({ ws, roomId, userVideo, myVideoOn, my
         const eventName: string = JSON.parse(eventData.data).event
         switch(eventName){
             case "get-all-users":
-                const { users, timerInit }: { users: string[], timerInit: number } = JSON.parse(eventData.data).usersInRoom
-                createPeerConnections(users);
-                startTimer(timerInit)
+                const { usersInRoom, timerInit }: { usersInRoom: string[], timerInit: number } = JSON.parse(eventData.data);                
+                createPeerConnections(usersInRoom);
+                // startTimer(timerInit)
                 break;
             case "new-user-joined":
                 const signalData: SignalData = JSON.parse(eventData.data).signalData
