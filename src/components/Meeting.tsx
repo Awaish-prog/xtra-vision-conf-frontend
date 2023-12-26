@@ -135,8 +135,9 @@ const Meeting: React.FC<MeeetingProps> = ({ ws, roomId, userVideo, myVideoOn, my
         const eventName: string = JSON.parse(eventData.data).event
         switch(eventName){
             case "get-all-users":
-                const users: string[] = JSON.parse(eventData.data).usersInRoom
+                const { users, timerInit }: { users: string[], timerInit: number } = JSON.parse(eventData.data).usersInRoom
                 createPeerConnections(users);
+                startTimer(timerInit)
                 break;
             case "new-user-joined":
                 const signalData: SignalData = JSON.parse(eventData.data).signalData
@@ -155,13 +156,11 @@ const Meeting: React.FC<MeeetingProps> = ({ ws, roomId, userVideo, myVideoOn, my
                 startTimer(timer)
                 break;
             case "turn-off-camera":
-                const userIdVideoOff: string = JSON.parse(eventData.data).userId
-                const turnOnVideo: boolean = JSON.parse(eventData.data).turnOn
+                const { userIdVideoOff, turnOnVideo } : { userIdVideoOff: string, turnOnVideo: boolean } = JSON.parse(eventData.data)
                 turnOffVideo(userIdVideoOff, turnOnVideo);
                 break;
             case "turn-off-mic":
-                const userIdMicOff: string = JSON.parse(eventData.data).userId
-                const turnOnMic: boolean = JSON.parse(eventData.data).turnOn
+                const { userIdMicOff, turnOnMic } : { userIdMicOff: string, turnOnMic: boolean } = JSON.parse(eventData.data)
                 turnOffMic(userIdMicOff, turnOnMic);
                 break;
             default:

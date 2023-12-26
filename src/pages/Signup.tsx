@@ -1,6 +1,7 @@
 import React, { SyntheticEvent, useState } from "react";
 import { checkEmailInput, checkEmptyInput } from "../utils/InputValidation";
 import { Button, Paper, TextField } from "@mui/material";
+import { signUpUserApi } from "../apis/UserApis";
 
 const Signup: React.FC = (): JSX.Element => {
     const [ email, setEmail ] = useState<string>("");
@@ -13,12 +14,10 @@ const Signup: React.FC = (): JSX.Element => {
     const [ passwordError, setPasswordError ] = useState<boolean>(false);
     const [ userError, setUserError ] = useState<boolean>(false);
 
-    function handleSignup(e: SyntheticEvent){
+    async function handleSignup(e: SyntheticEvent){
         e.preventDefault();
         if(checkEmail() && checkPassword() && checkUserName()){
-            console.log(email);
-            console.log(password);
-            console.log(userName);         
+            const response = await signUpUserApi(userName, password, email);
         }
     }
     function checkPassword(): boolean {
@@ -34,7 +33,7 @@ const Signup: React.FC = (): JSX.Element => {
     return <>
         <Paper component="form" elevation={5} onSubmit={handleSignup} >
 
-            <TextField id="userName" label="User Name" variant="outlined" value={userName} onChange={(e) => setUserName(e.target.value)} error={userError} helperText={userErrorMessage} onBlur={checkUserName} />
+            <TextField id="userName" label="Name" variant="outlined" value={userName} onChange={(e) => setUserName(e.target.value)} error={userError} helperText={userErrorMessage} onBlur={checkUserName} />
 
             <TextField id="email" label="Email" variant="outlined" value={email} onChange={(e) => setEmail(e.target.value)} error={emailError} helperText={emailErrorMessage} onBlur={checkEmail} />
 

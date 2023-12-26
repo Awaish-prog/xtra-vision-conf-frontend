@@ -3,6 +3,7 @@ import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import { checkEmailInput, checkEmptyInput } from "../utils/InputValidation";
+import { loginUserApi } from "../apis/UserApis";
 
 
 const Login: React.FC = (): JSX.Element => {
@@ -13,11 +14,11 @@ const Login: React.FC = (): JSX.Element => {
     const [ emailError, setEmailError ] = useState<boolean>(false);
     const [ passwordError, setPasswordError ] = useState<boolean>(false);
 
-    function handleLogin(e: SyntheticEvent){
+    async function handleLogin(e: SyntheticEvent){
         e.preventDefault();
         if(checkEmail() && checkPassword()){
-            console.log(email);
-            console.log(password);            
+            const response = await loginUserApi(password, email);
+            console.log(response);          
         }
     }
     function checkPassword(): boolean {
