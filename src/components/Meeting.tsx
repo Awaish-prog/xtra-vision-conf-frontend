@@ -5,10 +5,9 @@ import { Peers, SignalData } from "../types/MeetingTypes";
 import Video from "./Video";
 import { MeeetingProps } from "../types/PropTypes";
 
-const Meeting: React.FC<MeeetingProps> = ({ ws, roomId, userVideo, myVideoOn, myAudioOn, startTimer }: MeeetingProps): JSX.Element => {
+const Meeting: React.FC<MeeetingProps> = ({ ws, roomId, userId, userVideo, myVideoOn, myAudioOn, startTimer }: MeeetingProps): JSX.Element => {
     const [peers, setPeers] = useState<Peers[]>([]);
     const peersRef = useRef<Peers[]>([]);
-    const userId: string = window.location.href;
 
     function getMyStreamAndJoinRoom(ws: WebSocket){
         navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
@@ -80,7 +79,7 @@ const Meeting: React.FC<MeeetingProps> = ({ ws, roomId, userVideo, myVideoOn, my
         return peer;
     }
 
-    function createPeer(userToConnect: string, userId: string, stream: any) {
+    function createPeer(userToConnect: string, userId: string | null, stream: any) {
         const peer = new Peer({
             initiator: true,
             trickle: false,
@@ -157,6 +156,9 @@ const Meeting: React.FC<MeeetingProps> = ({ ws, roomId, userVideo, myVideoOn, my
                 break;
             case "turn-off-camera":
                 const { userIdVideoOff, turnOnVideo } : { userIdVideoOff: string, turnOnVideo: boolean } = JSON.parse(eventData.data)
+                console.log(JSON.parse(eventData.data));
+                console.log(userIdVideoOff, turnOnVideo);
+                
                 turnOffVideo(userIdVideoOff, turnOnVideo);
                 break;
             case "turn-off-mic":

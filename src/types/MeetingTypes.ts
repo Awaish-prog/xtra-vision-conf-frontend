@@ -3,7 +3,7 @@ import Peer, { Instance as SimplePeerInstance } from 'simple-peer';
 export type Meeting = {
     id: number,
     title: string,
-    host: string,
+    hostId: string,
     dateTime: string,
     _id?: any
 }

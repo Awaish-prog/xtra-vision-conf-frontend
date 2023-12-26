@@ -7,18 +7,21 @@ import { DateTimePicker } from '@mui/x-date-pickers';
 import dayjs, { Dayjs } from 'dayjs';
 import { checkEmptyInput } from '../utils/InputValidation';
 import { createNewMeetingApi } from '../apis/MeetingApis';
+import { Meeting } from '../types/MeetingTypes';
+import { useNavigate } from 'react-router-dom';
+import "../styles/MeetingDashboard.css";
 
-const MeetingOptions: React.FC = (): JSX.Element => {
+const MeetingOptions: React.FC<{addMeetingInUpcomingMeetings: Function}> = ({ addMeetingInUpcomingMeetings } : {addMeetingInUpcomingMeetings: Function}): JSX.Element => {
     const [ open, setOpen ] = useState<boolean>(false);
     const [ openDate, setOpenDate ] = useState<boolean>(false);
     const [ title, setTitle ] = useState<string>("");
     const [ titleError, setTitleError ] = useState<boolean>(false);
     const [ titleErrorMessage, setTitleErrorMessage] = useState<string>("");
     const [ date, setDate ] = React.useState<Dayjs | null>(dayjs().add(1, 'hour'));
+    const navigate = useNavigate();
 
     function handleClose(){
         setOpen(false);
-        setOpenDate(false);
         setTitle("");
         setDate(dayjs().add(1, 'hour'));
         setTitleError(false);
@@ -44,11 +47,22 @@ const MeetingOptions: React.FC = (): JSX.Element => {
     async function createMeeting(){
         if(validateTitle()){
             const response = await createNewMeetingApi(title, date);
-            response.data.status === 200 ? handleClose(): console.log("Failed..");
+            if(response.data.status === 200){
+                handleClose();
+                const { id, hostId, title, dateTime }: Meeting = response.data.data;
+                addMeetingInUpcomingMeetings({ id, hostId, title, dateTime });
+                if(!openDate){
+                    navigate(`/join-meeting?roomId=${id}`)
+                }
+                setOpenDate(false);
+            }
+            else{
+                console.log(response.data.data);
+            }
         }
     }
 
-    return <Container>
+    return <div className="meeting-options-container">
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle>Create Meeting</DialogTitle>
                 <DialogContent>
@@ -61,13 +75,15 @@ const MeetingOptions: React.FC = (): JSX.Element => {
                     <Button onClick={createMeeting}>Create Meeting</Button>
                 </DialogActions>
             </Dialog>
-            <Container onClick={() => handleMeetingFormPopUp(false)}>
-                <MeetingOption icon = {VideocamIcon} iconText = {"New meeting"} />
-            </Container>
-            <Container onClick={() => handleMeetingFormPopUp(true)}>
-                <MeetingOption icon = {CalendarMonthIcon} iconText = {"Schedule meeting"} />
-            </Container>
-        </Container>
+            <div className="create-meeting-options">
+                <div className="create-meeting-option" onClick={() => handleMeetingFormPopUp(false)}>
+                    <MeetingOption icon = {VideocamIcon} iconText = {"New meeting"} />
+                </div>
+                <div className="create-meeting-option" onClick={() => handleMeetingFormPopUp(true)}>
+                    <MeetingOption icon = {CalendarMonthIcon} iconText = {"Schedule meeting"} />
+                </div>
+            </div>
+        </div>
 }
 
 export default MeetingOptions;

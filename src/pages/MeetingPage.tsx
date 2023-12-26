@@ -3,7 +3,8 @@ import Meeting from "../components/Meeting";
 import { Button, Container } from "@mui/material";
 import Timers from "../components/Timers";
 import Timer from "../components/Timer";
-
+import { useLocation } from "react-router-dom";
+import { v4 as uuidv4 } from 'uuid';
 
 const MeetingPage: React.FC = (): JSX.Element => {
     const [ myVideoOn, setMyVideoOn ] = useState<boolean>(true);
@@ -13,19 +14,22 @@ const MeetingPage: React.FC = (): JSX.Element => {
     let interval: number = useMemo(() => 0, [])
     const ws: WebSocket = useMemo(() => new WebSocket('ws://localhost:3001'), []);
     const userVideo = useRef<HTMLVideoElement | null>(null);
-    const roomId = "1234";
+    const { search } = useLocation();
+    const queryParams = new URLSearchParams(search);
+    const roomId: string | null = queryParams.get('roomId');
+    const userId: string | null = localStorage.getItem('userId') ? localStorage.getItem('userId') : uuidv4();
 
     function sendTimer(timer: number){
         ws.send(JSON.stringify({event: "send-timer", data: { timer, roomId}}));
     }
 
     function toggleCamera(){
-        ws.send(JSON.stringify({event: "turn-camera-off", data: { userId: window.location.href, roomId, turnOn: !myVideoOn}}))
+        ws.send(JSON.stringify({event: "turn-camera-off", data: { userId, roomId, turnOn: !myVideoOn}}))
         setMyVideoOn(prev => !prev)
     }
 
     function toggleMic(){
-        ws.send(JSON.stringify({event: "turn-mic-off", data: { userId: window.location.href, roomId, turnOn: !myAudioOn}}))
+        ws.send(JSON.stringify({event: "turn-mic-off", data: { userId, roomId, turnOn: !myAudioOn}}))
         setMyAudioOn(prev => !prev)
     }
 
@@ -51,7 +55,7 @@ const MeetingPage: React.FC = (): JSX.Element => {
 
     return <>
         <Timer timer= {timer} />
-        <Meeting ws = {ws} roomId={roomId} userVideo={userVideo} myVideoOn={myVideoOn} myAudioOn={myAudioOn} startTimer={startTimer} />
+        <Meeting ws = {ws} roomId={roomId} userId = {userId} userVideo={userVideo} myVideoOn={myVideoOn} myAudioOn={myAudioOn} startTimer={startTimer} />
         <Button onClick={toggleCamera} >toggle camera</Button>
         <Button onClick={toggleMic} >toggle mic</Button>
         <Container>

@@ -1,0 +1,48 @@
+.dashboard-container {
+    height: 100%;
+    width: 98%;
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 2%;
+}
+.meetings-options-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+.meeting-options-container {
+    width: 20%;
+    border: 1px solid gray;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.meetings-container {
+    width: 80%;
+}
+.create-meeting-options {
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.create-meeting-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border: 1px solid blue;
+    border-radius: 10px;
+    margin: 10px;
+}
+.create-meeting-option {
+    width: 100%;
+}
