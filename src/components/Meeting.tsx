@@ -170,7 +170,6 @@ const Meeting: React.FC<MeeetingProps> = ({ ws, roomId, userId, userVideo, myVid
                 
         }
     }
-    console.log(peers.filter(peer => peer.peerID === hostId).length);
     useEffect(() => {
         ws.addEventListener('message', wsEventHandler)
         getMyStreamAndJoinRoom(ws)
@@ -181,9 +180,9 @@ const Meeting: React.FC<MeeetingProps> = ({ ws, roomId, userId, userVideo, myVid
             ws.removeEventListener("message", wsEventHandler);
         }
     }, []);
-
-    return <div className="conf-div">
-            <video playsInline autoPlay ref={userVideo} muted={!myAudioOn} style={{
+    const isHostPresent: boolean = peers.filter(peer => peer.peerID === hostId).length > 0;
+    return <div className={isHostPresent ? "conf-div conf-dev-host" : "conf-div"}>
+            <video playsInline autoPlay ref={userVideo} muted={true} style={{
                 position: 'absolute',
                 bottom: '10px',
                 right: '25px'
@@ -198,11 +197,11 @@ const Meeting: React.FC<MeeetingProps> = ({ ws, roomId, userId, userVideo, myVid
                 alignItems: 'center',
                 border: '1px solid gray'
             }} ><img width={myVideoOn ? '0px' : '200px'} height={'170px'} src = {avatar} alt="avatar" /></div>
-            <div className="participants-container">
+            <div className={isHostPresent ? "participants-container participants-container-host" : "participants-container"}>
             {
                 peers.map((peer, index) => {
                     return (
-                        peer.connected && <Video key={index} hostId = {hostId} peer={peer} />
+                        peer.connected && <Video key={index} hostId = {hostId} peer={peer} isHostPresent = {isHostPresent} />
                     );
                 })
             }

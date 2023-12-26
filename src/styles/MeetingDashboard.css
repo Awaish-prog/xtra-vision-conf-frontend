@@ -151,6 +151,22 @@
     align-items: center;
     flex-wrap: wrap;
 }
+.conf-dev-host {
+    width: 20vw;
+    flex-direction: column;
+}
+.participants-container-host {
+    width: 100%;
+    flex-direction: column;
+}
+.participant-name {
+    text-align: center;
+    margin: 0;
+    color: white;
+    background-color: blue;
+    border-radius: 5px;
+    font-size: small;
+}
 
 @media (max-width: 1000px) {
     .meetings-options-container{

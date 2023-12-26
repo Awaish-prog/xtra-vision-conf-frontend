@@ -12,7 +12,8 @@ export type MeetingCardProps = {
 
 export type VideoProps = {
     peer: Peers,
-    hostId: string
+    hostId: string,
+    isHostPresent: boolean
 }
 
 export type VideosProps = {
