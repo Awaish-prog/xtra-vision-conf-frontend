@@ -13,12 +13,8 @@ export type MeetingCardProps = {
 export type VideoProps = {
     peer: Peers,
     hostId: string,
-    isHostPresent: boolean
-}
-
-export type VideosProps = {
-    userVideo: any,
-    peers: Peers[]
+    isHostPresent: boolean,
+    userIdtoNames: { [key: string]: string }
 }
 
 export type TimerProps = {
@@ -34,5 +30,10 @@ export type MeeetingProps = {
     myVideoOn: boolean,
     myAudioOn: boolean,
     hostId: string,
+    userIdsToNames: {[key: string]: string},
+    setUserIdsToNames: Function,
+    roomFull: { (): void },
+    raiseHandHandler: { (userIdRaisedHand: string): void },
+    putDownHandler: { (userIdPutDown: string): void },
     startTimer: { (timer: number): void }
 }

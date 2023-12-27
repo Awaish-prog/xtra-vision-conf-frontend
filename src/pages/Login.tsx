@@ -5,6 +5,7 @@ import Button from '@mui/material/Button';
 import { checkEmailInput, checkEmptyInput } from "../utils/InputValidation";
 import { loginUserApi } from "../apis/UserApis";
 import { Link, useNavigate } from "react-router-dom";
+import CircularProgress from '@mui/material/CircularProgress';
 import "../styles/LoginSignup.css";
 
 const Login: React.FC = (): JSX.Element => {
@@ -14,18 +15,25 @@ const Login: React.FC = (): JSX.Element => {
     const [ passwordErrorMessage, setPasswordErrorMessage ] = useState<string>("");
     const [ emailError, setEmailError ] = useState<boolean>(false);
     const [ passwordError, setPasswordError ] = useState<boolean>(false);
+    const [ loader, setLoader ] = useState<boolean>(false);
+    const [ errorMessage, setErrorMessage ] = useState<string>("");
     const navigate = useNavigate();
 
     async function handleLogin(e: SyntheticEvent){
         e.preventDefault();
         if(checkEmail() && checkPassword()){
+            setLoader(true);
             const response = await loginUserApi(password, email);
             if(response.data && response.data.status === 200){
                 localStorage.setItem('email', response.data.data.email);
                 localStorage.setItem('token', response.data.data.token);
                 localStorage.setItem('userId', response.data.data.id);
-                navigate("/meetings")
+                localStorage.setItem('userName', response.data.data.name);
+                setLoader(false);
+                navigate("/meetings");
             }
+            setErrorMessage(response.data.data.message);
+            setLoader(false);
         }
     }
     function checkPassword(): boolean {
@@ -42,7 +50,9 @@ const Login: React.FC = (): JSX.Element => {
 
             <TextField className="inputs" id="password" label="Password" variant="outlined" type="password" value={password} onChange={(e) => setPassword(e.target.value)} error={passwordError} helperText={passwordErrorMessage} onBlur={checkPassword} />
 
-            <Button variant="contained" size="large" type="submit">Login</Button>
+            {errorMessage && <p className="error-message">{errorMessage}</p>}
+
+            <Button variant="contained" size="large" type="submit">{loader ? <CircularProgress size={30} color='secondary' /> : "Login"}</Button>
             <span><Link style={{color: 'blue'}} to="/signup">Signup</Link> is you don't have an account</span>
         </Paper>
     </>

@@ -6,7 +6,7 @@ import { MeeetingProps } from "../types/PropTypes";
 import avatar from "../assets/avatar.png";
 import "../styles/MeetingDashboard.css";
 
-const Meeting: React.FC<MeeetingProps> = ({ ws, roomId, userId, userVideo, myVideoOn, myAudioOn, hostId, startTimer }: MeeetingProps): JSX.Element => {
+const Meeting: React.FC<MeeetingProps> = ({ ws, roomId, userId, userVideo, myVideoOn, myAudioOn, hostId, startTimer, roomFull, raiseHandHandler, putDownHandler, userIdsToNames, setUserIdsToNames }: MeeetingProps): JSX.Element => {
     const [peers, setPeers] = useState<Peers[]>([]);
     const peersRef = useRef<Peers[]>([]);
 
@@ -39,6 +39,7 @@ const Meeting: React.FC<MeeetingProps> = ({ ws, roomId, userId, userVideo, myVid
             });
         })
         setPeers(peers);
+        ws.send(JSON.stringify({event: "get-user-names"}));
     }
 
     function createPeerForNewUser(signalData: SignalData){
@@ -57,6 +58,7 @@ const Meeting: React.FC<MeeetingProps> = ({ ws, roomId, userId, userVideo, myVid
             videoOn: true,
             audioOn: true
         }]);
+        ws.send(JSON.stringify({event: "get-user-names"}));
     }
 
     function createPeerWithUserInMeeting(signalData: SignalData){
@@ -155,15 +157,27 @@ const Meeting: React.FC<MeeetingProps> = ({ ws, roomId, userId, userVideo, myVid
                 startTimer(timer)
                 break;
             case "turn-off-camera":
-                const { userIdVideoOff, turnOnVideo } : { userIdVideoOff: string, turnOnVideo: boolean } = JSON.parse(eventData.data)
-                console.log(JSON.parse(eventData.data));
-                console.log(userIdVideoOff, turnOnVideo);
-                
+                const { userIdVideoOff, turnOnVideo } : { userIdVideoOff: string, turnOnVideo: boolean } = JSON.parse(eventData.data);
                 turnOffVideo(userIdVideoOff, turnOnVideo);
                 break;
             case "turn-off-mic":
                 const { userIdMicOff, turnOnMic } : { userIdMicOff: string, turnOnMic: boolean } = JSON.parse(eventData.data)
                 turnOffMic(userIdMicOff, turnOnMic);
+                break;
+            case "get-user-names":
+                const userIdsToNames = JSON.parse(eventData.data).userIdsToNames
+                setUserIdsToNames(userIdsToNames);
+                break;
+            case "room-is-full":
+                roomFull();
+                break;
+            case "raise-hand":
+                const userIdRaisedHand: string = JSON.parse(eventData.data).data.userId
+                raiseHandHandler(userIdRaisedHand);
+                break;
+            case "put-down":
+                const userIdPutDown: string = JSON.parse(eventData.data).data.userId
+                putDownHandler(userIdPutDown);
                 break;
             default:
                 console.log(eventName);
@@ -201,7 +215,7 @@ const Meeting: React.FC<MeeetingProps> = ({ ws, roomId, userId, userVideo, myVid
             {
                 peers.map((peer, index) => {
                     return (
-                        peer.connected && <Video key={index} hostId = {hostId} peer={peer} isHostPresent = {isHostPresent} />
+                        peer.connected && <Video key={index} hostId = {hostId} peer={peer} isHostPresent = {isHostPresent} userIdtoNames={userIdsToNames} />
                     );
                 })
             }

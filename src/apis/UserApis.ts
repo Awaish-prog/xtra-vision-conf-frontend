@@ -2,6 +2,7 @@ import axios from "axios";
 import apiUrl from "./Apiurl";
 
 async function signUpUserApi(name: string, password: string, email: string){
+    email = email.toLowerCase();
     const response = axios.post(`${apiUrl}signup`, {
         name,
         email,
@@ -11,6 +12,7 @@ async function signUpUserApi(name: string, password: string, email: string){
 }
 
 async function loginUserApi(password: string, email: string){
+    email = email.toLowerCase();
     const response = axios.post(`${apiUrl}login`, {
         email,
         password
