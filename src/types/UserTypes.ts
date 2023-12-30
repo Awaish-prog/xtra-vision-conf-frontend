@@ -3,3 +3,9 @@ export type User = {
     password: string,
     email: string
 }
+export type UsersToStreamStatus = { 
+    [key: string]: { 
+        videoOn: boolean, 
+        audioOn: boolean
+    }
+ }

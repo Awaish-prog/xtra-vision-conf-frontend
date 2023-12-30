@@ -5,6 +5,7 @@ import Video from "./Video";
 import { MeeetingProps } from "../types/PropTypes";
 import avatar from "../assets/avatar.png";
 import "../styles/MeetingDashboard.css";
+import { UsersToStreamStatus } from "../types/UserTypes";
 
 const Meeting: React.FC<MeeetingProps> = ({ ws, roomId, userId, userVideo, myVideoOn, myAudioOn, hostId, startTimer, roomFull, raiseHandHandler, putDownHandler, userIdsToNames, setUserIdsToNames }: MeeetingProps): JSX.Element => {
     const [peers, setPeers] = useState<Peers[]>([]);
@@ -19,7 +20,7 @@ const Meeting: React.FC<MeeetingProps> = ({ ws, roomId, userId, userVideo, myVid
         })
     }
 
-    function createPeerConnections(users: string[]){
+    function createPeerConnections(users: string[], usersToStreamStatus: UsersToStreamStatus){
         const peers: Peers[] = [];
         users.forEach(userToConnect => {
             const peer = createPeer(userToConnect, userId, userVideo.current?.srcObject);
@@ -34,8 +35,8 @@ const Meeting: React.FC<MeeetingProps> = ({ ws, roomId, userId, userVideo, myVid
                 peerID: userToConnect,
                 peer,
                 connected: true,
-                videoOn: true,
-                audioOn: true,
+                videoOn: (usersToStreamStatus[userToConnect] && usersToStreamStatus[userToConnect]) ? usersToStreamStatus[userToConnect].videoOn : true,
+                audioOn: (usersToStreamStatus[userToConnect] && usersToStreamStatus[userToConnect]) ? usersToStreamStatus[userToConnect].audioOn : true,
             });
         })
         setPeers(peers);
@@ -137,8 +138,8 @@ const Meeting: React.FC<MeeetingProps> = ({ ws, roomId, userId, userVideo, myVid
         const eventName: string = JSON.parse(eventData.data).event
         switch(eventName){
             case "get-all-users":
-                const { usersInRoom }: { usersInRoom: string[], timerInit: number } = JSON.parse(eventData.data);                
-                createPeerConnections(usersInRoom);
+                const { usersInRoom, usersToStreamStatus }: { usersInRoom: string[], usersToStreamStatus: UsersToStreamStatus } = JSON.parse(eventData.data);                
+                createPeerConnections(usersInRoom, usersToStreamStatus);
                 break;
             case "new-user-joined":
                 const signalData: SignalData = JSON.parse(eventData.data).signalData
@@ -194,24 +195,24 @@ const Meeting: React.FC<MeeetingProps> = ({ ws, roomId, userId, userVideo, myVid
             ws.removeEventListener("message", wsEventHandler);
         }
     }, []);
-    const isHostPresent: boolean = peers.filter(peer => peer.peerID === hostId).length > 0;
+    const isHostPresent: boolean = peers.filter(peer => peer.peerID === hostId && peer.connected).length > 0;
     return <div className={isHostPresent ? "conf-div conf-dev-host" : "conf-div"}>
             <video playsInline autoPlay ref={userVideo} muted={true} style={{
                 position: 'absolute',
-                bottom: '10px',
-                right: '25px'
+                bottom: '55px',
+                right: '25px',
             }} width={myVideoOn ? '250px' : '0px'} />
             <div style= {{
                 position: 'absolute',
-                bottom: '10px',
+                bottom: '55px',
                 right: '25px',
                 width: myVideoOn ? '0px' : '250px',
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
                 border: '1px solid gray'
-            }} ><img width={myVideoOn ? '0px' : '200px'} height={'170px'} src = {avatar} alt="avatar" /></div>
-            <div className={isHostPresent ? "participants-container participants-container-host" : "participants-container"}>
+            }} ><img width={myVideoOn ? '0px' : '200px'} height={'185px'} src = {avatar} alt="avatar" /></div>
+
             {
                 peers.map((peer, index) => {
                     return (
@@ -219,7 +220,6 @@ const Meeting: React.FC<MeeetingProps> = ({ ws, roomId, userId, userVideo, myVid
                     );
                 })
             }
-            </div>
         </div>
 }
 

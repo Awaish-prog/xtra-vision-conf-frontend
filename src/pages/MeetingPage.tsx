@@ -193,13 +193,19 @@ const MeetingPage: React.FC = (): JSX.Element => {
             
             <Meeting ws = {ws} roomId={roomId} userId = {userId} userVideo={userVideo} myVideoOn={myVideoOn} myAudioOn={myAudioOn} hostId={hostId} startTimer={startTimer} roomFull={roomFull} raiseHandHandler={raiseHandHandler} putDownHandler={putDownHandler} userIdsToNames={userIdsToNames} setUserIdsToNames={setUserIdsToNames}  />
 
-            <div className="raised-hands">
+            {hostId === userId && <div className="actions-container">
+                <h3>Notifications</h3>
+                <div className="actions">
                 {
+                    raisedHands && raisedHands.length ?
                     raisedHands.map((raisedHand) => {
                         return <p key={raisedHand}>{userIdsToNames[raisedHand]} has raised hand</p>
                     })
+                    :
+                    <p>No notifications yet</p>
                 }
-            </div>
+                </div>
+            </div>}
             
             <div className="meeting-buttons-container">
             <div className="meeting-buttons">
@@ -224,7 +230,7 @@ const MeetingPage: React.FC = (): JSX.Element => {
             <div className="meeting-button margin-right" onClick={endCall}>
                 <CallEndIcon />
             </div>
-            {hostId === userId && <p>Countdown timers: </p>}
+            {hostId === userId && <p style={{margin: '0px'}}>Countdown timers: </p>}
             {hostId === userId && <Timers timers={timers} sendTimer={sendTimer} />}
             {hostId !== userId && <div className={handRaised ? "meeting-button" : "raise-hand"} onClick={raiseHand}><BackHandIcon /></div>}
             </div>
