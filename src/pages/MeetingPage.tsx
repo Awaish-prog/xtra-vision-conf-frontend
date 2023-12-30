@@ -30,10 +30,10 @@ const MeetingPage: React.FC = (): JSX.Element => {
     const [ handRaised, setHandRaised ] = useState<boolean>(false);
     const [ errorMessage, setErrorMessage ] = useState<string>("");
     const [ raisedHands, setRaisedHands ] = useState<string[]>([]);
+    const [ stream, setStream ] = useState<MediaStream>();
     const [ userIdsToNames, setUserIdsToNames ] = useState<{ [key: string]: string }>({});
-    const timers: number[] = [15, 30, 45, 60]
     const [ timer, setTimer ] = useState<number>(-3)
-    let interval: number = useMemo(() => 0, [])
+    const timers: number[] = [15, 30, 45, 60]
     const ws: WebSocket = useMemo(() => new WebSocket('ws://localhost:3001'), []);
     const userVideo = useRef<HTMLVideoElement | null>(null);
     const { search } = useLocation();
@@ -41,6 +41,7 @@ const MeetingPage: React.FC = (): JSX.Element => {
     const queryParams = new URLSearchParams(search);
     const roomId: string | null = queryParams.get('roomId');
     const userId: string | null = useMemo(() => localStorage.getItem('userId') ? localStorage.getItem('userId') : uuidv4(), []);
+    let interval: number = useMemo(() => 0, []);
     
 
     function sendTimer(timer: number){
@@ -163,6 +164,7 @@ const MeetingPage: React.FC = (): JSX.Element => {
         getHostId()
         insertHostUserName()
         return () => {
+            localStorage.setItem('refresh', 'true');
             ws.removeEventListener("message", handleMessage);
         }
     }, [])
@@ -191,7 +193,7 @@ const MeetingPage: React.FC = (): JSX.Element => {
             <div className="conf-container">
             <Timer timer= {timer} />
             
-            <Meeting ws = {ws} roomId={roomId} userId = {userId} userVideo={userVideo} myVideoOn={myVideoOn} myAudioOn={myAudioOn} hostId={hostId} startTimer={startTimer} roomFull={roomFull} raiseHandHandler={raiseHandHandler} putDownHandler={putDownHandler} userIdsToNames={userIdsToNames} setUserIdsToNames={setUserIdsToNames}  />
+            <Meeting ws = {ws} roomId={roomId} userId = {userId} userVideo={userVideo} myVideoOn={myVideoOn} myAudioOn={myAudioOn} hostId={hostId} startTimer={startTimer} roomFull={roomFull} raiseHandHandler={raiseHandHandler} putDownHandler={putDownHandler} userIdsToNames={userIdsToNames} setUserIdsToNames={setUserIdsToNames} setStream = {setStream}  />
 
             {hostId === userId && <div className="actions-container">
                 <h3>Notifications</h3>
@@ -199,7 +201,7 @@ const MeetingPage: React.FC = (): JSX.Element => {
                 {
                     raisedHands && raisedHands.length ?
                     raisedHands.map((raisedHand) => {
-                        return <p key={raisedHand}>{userIdsToNames[raisedHand]} has raised hand</p>
+                        return userIdsToNames[raisedHand] && <p key={raisedHand}>{userIdsToNames[raisedHand]} has raised hand</p>
                     })
                     :
                     <p>No notifications yet</p>

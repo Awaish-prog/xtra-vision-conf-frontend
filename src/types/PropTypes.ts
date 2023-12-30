@@ -7,7 +7,8 @@ export type MeetingOptionProps = {
 }
 
 export type MeetingCardProps = {
-    meeting: Meeting
+    meeting: Meeting,
+    upcoming: boolean
 }
 
 export type VideoProps = {
@@ -32,6 +33,7 @@ export type MeeetingProps = {
     hostId: string,
     userIdsToNames: {[key: string]: string},
     setUserIdsToNames: Function,
+    setStream: Function,
     roomFull: { (): void },
     raiseHandHandler: { (userIdRaisedHand: string): void },
     putDownHandler: { (userIdPutDown: string): void },

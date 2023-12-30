@@ -7,12 +7,13 @@ import avatar from "../assets/avatar.png";
 import "../styles/MeetingDashboard.css";
 import { UsersToStreamStatus } from "../types/UserTypes";
 
-const Meeting: React.FC<MeeetingProps> = ({ ws, roomId, userId, userVideo, myVideoOn, myAudioOn, hostId, startTimer, roomFull, raiseHandHandler, putDownHandler, userIdsToNames, setUserIdsToNames }: MeeetingProps): JSX.Element => {
+const Meeting: React.FC<MeeetingProps> = ({ ws, roomId, userId, userVideo, myVideoOn, myAudioOn, hostId, startTimer, roomFull, raiseHandHandler, putDownHandler, userIdsToNames, setUserIdsToNames, setStream }: MeeetingProps): JSX.Element => {
     const [peers, setPeers] = useState<Peers[]>([]);
     const peersRef = useRef<Peers[]>([]);
 
     function getMyStreamAndJoinRoom(ws: WebSocket){
         navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
+            setStream(stream);
             if(userVideo.current){
                 userVideo.current.srcObject = stream;
             }

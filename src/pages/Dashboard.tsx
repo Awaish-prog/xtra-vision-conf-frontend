@@ -45,6 +45,10 @@ const Dashboard: React.FC = (): JSX.Element => {
     }
     
     useEffect(() => {
+        if(localStorage.getItem('refresh') === 'true'){
+            window.location.reload();
+            localStorage.removeItem('refresh')
+        }
         if(!localStorage.getItem("userId") || !localStorage.getItem("userId") || !localStorage.getItem("email")){
             window.history.replaceState(null, "", '/');
             navigate(-1)
@@ -80,14 +84,14 @@ const Dashboard: React.FC = (): JSX.Element => {
                                 toggleMeetings === 0 ?
                                 (upcomingMettings.length ?
                                 upcomingMettings.map((upcomingMetting) => {
-                                    return <MeetingCard meeting = {upcomingMetting} />
+                                    return <MeetingCard upcoming={true} meeting = {upcomingMetting} />
                                 })
                                 :
                                 <p className="error-message-margin">You don't have any upcoming meetings</p>)
                                 :
                                 (previousMettings.length ?
                                 previousMettings.map((previousMetting) => {
-                                    return <MeetingCard meeting = {previousMetting} />
+                                    return <MeetingCard upcoming={false} meeting = {previousMetting} />
                                 })
                                 :
                                 <p className="error-message-margin">You don't have any previous meetings</p>)

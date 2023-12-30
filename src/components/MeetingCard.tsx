@@ -4,7 +4,7 @@ import { MeetingCardProps } from "../types/PropTypes";
 import { useNavigate } from "react-router-dom";
 import "../styles/MeetingDashboard.css";
 
-const MeetingCard: React.FC<MeetingCardProps> = ({ meeting }: MeetingCardProps): JSX.Element => {
+const MeetingCard: React.FC<MeetingCardProps> = ({ meeting, upcoming }: MeetingCardProps): JSX.Element => {
     const navigate = useNavigate()
     function joinMeeting(){
         navigate(`/join-meeting?roomId=${meeting.id}`)
@@ -13,7 +13,7 @@ const MeetingCard: React.FC<MeetingCardProps> = ({ meeting }: MeetingCardProps):
     return <Card className="meeting-card">
         <p>{(new Date(meeting.dateTime)).toLocaleString()}</p>
         <h3>{meeting.title}</h3>
-        <Button onClick={joinMeeting}>Join</Button>
+        {upcoming && <Button onClick={joinMeeting}>Join</Button>}
     </Card>
 }
 
