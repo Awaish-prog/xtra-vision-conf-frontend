@@ -24,7 +24,6 @@ export type TimerProps = {
 }
 
 export type MeeetingProps = {
-    ws: WebSocket,
     roomId: string | null,
     userId: string | null,
     userVideo: any,
@@ -33,9 +32,9 @@ export type MeeetingProps = {
     hostId: string,
     userIdsToNames: {[key: string]: string},
     setUserIdsToNames: Function,
-    setStream: Function,
     roomFull: { (): void },
     raiseHandHandler: { (userIdRaisedHand: string): void },
     putDownHandler: { (userIdPutDown: string): void },
-    startTimer: { (timer: number): void }
+    startTimer: { (timer: number): void },
+    setWsMeeting: { (wsMeeting: WebSocket): void }
 }

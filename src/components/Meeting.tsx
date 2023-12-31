@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Peer from 'simple-peer';
 import { Peers, SignalData } from "../types/MeetingTypes";
 import Video from "./Video";
@@ -7,18 +7,21 @@ import avatar from "../assets/avatar.png";
 import "../styles/MeetingDashboard.css";
 import { UsersToStreamStatus } from "../types/UserTypes";
 
-const Meeting: React.FC<MeeetingProps> = ({ ws, roomId, userId, userVideo, myVideoOn, myAudioOn, hostId, startTimer, roomFull, raiseHandHandler, putDownHandler, userIdsToNames, setUserIdsToNames, setStream }: MeeetingProps): JSX.Element => {
+const Meeting: React.FC<MeeetingProps> = ({ roomId, userId, userVideo, myVideoOn, myAudioOn, hostId, startTimer, roomFull, raiseHandHandler, putDownHandler, userIdsToNames, setUserIdsToNames, setWsMeeting }: MeeetingProps): JSX.Element => {
     const [peers, setPeers] = useState<Peers[]>([]);
     const peersRef = useRef<Peers[]>([]);
+    const ws: WebSocket = useMemo(() => new WebSocket('wss://awaish-khan-dev.mooo.com/web-socket/'), []);
 
-    function getMyStreamAndJoinRoom(ws: WebSocket){
+    function insertHostUserName(){
+        setWsMeeting(ws);
         navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
-            setStream(stream);
             if(userVideo.current){
                 userVideo.current.srcObject = stream;
             }
             ws.send(JSON.stringify({ event: "join-room", data: { roomId: roomId, userId: userId } }));
         })
+        const currentUser: string | null = localStorage.getItem("userName");
+        currentUser && ws.send(JSON.stringify({event: "enter-name", data: {userName: currentUser, userId}}));
     }
 
     function createPeerConnections(users: string[], usersToStreamStatus: UsersToStreamStatus){
@@ -188,12 +191,13 @@ const Meeting: React.FC<MeeetingProps> = ({ ws, roomId, userId, userVideo, myVid
     }
     useEffect(() => {
         ws.addEventListener('message', wsEventHandler)
-        getMyStreamAndJoinRoom(ws)
+        ws.addEventListener('open', insertHostUserName);
         return () => {
             peers.forEach((peer) => {
                 peer.peer.destroy()
             })
             ws.removeEventListener("message", wsEventHandler);
+            ws.removeEventListener('open', insertHostUserName);
         }
     }, []);
     const isHostPresent: boolean = peers.filter(peer => peer.peerID === hostId && peer.connected).length > 0;

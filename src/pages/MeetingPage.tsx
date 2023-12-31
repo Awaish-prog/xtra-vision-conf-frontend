@@ -30,11 +30,11 @@ const MeetingPage: React.FC = (): JSX.Element => {
     const [ handRaised, setHandRaised ] = useState<boolean>(false);
     const [ errorMessage, setErrorMessage ] = useState<string>("");
     const [ raisedHands, setRaisedHands ] = useState<string[]>([]);
-    const [ stream, setStream ] = useState<MediaStream>();
     const [ userIdsToNames, setUserIdsToNames ] = useState<{ [key: string]: string }>({});
     const [ timer, setTimer ] = useState<number>(-3)
+    const [ wsMeeting, setWsMeeting ] = useState<WebSocket>();
     const timers: number[] = [15, 30, 45, 60]
-    const ws: WebSocket = useMemo(() => new WebSocket('ws://localhost:3001'), []);
+    const ws: WebSocket = useMemo(() => new WebSocket('wss://awaish-khan-dev.mooo.com/web-socket/'), []);
     const userVideo = useRef<HTMLVideoElement | null>(null);
     const { search } = useLocation();
     const navigate = useNavigate();
@@ -45,16 +45,16 @@ const MeetingPage: React.FC = (): JSX.Element => {
     
 
     function sendTimer(timer: number){
-        ws.send(JSON.stringify({event: "send-timer", data: { timer, roomId}}));
+        wsMeeting?.send(JSON.stringify({event: "send-timer", data: { timer, roomId}}));
     }
 
     function toggleCamera(){
-        ws.send(JSON.stringify({event: "turn-camera-off", data: { userId, roomId, turnOn: !myVideoOn}}))
+        wsMeeting?.send(JSON.stringify({event: "turn-camera-off", data: { userId, roomId, turnOn: !myVideoOn}}))
         setMyVideoOn(prev => !prev)
     }
 
     function toggleMic(){
-        ws.send(JSON.stringify({event: "turn-mic-off", data: { userId, roomId, turnOn: !myAudioOn}}))
+        wsMeeting?.send(JSON.stringify({event: "turn-mic-off", data: { userId, roomId, turnOn: !myAudioOn}}))
         setMyAudioOn(prev => !prev)
     }
 
@@ -122,13 +122,6 @@ const MeetingPage: React.FC = (): JSX.Element => {
         }
     }
 
-    function insertHostUserName(){
-        setTimeout(() => {
-            const currentUser: string | null = localStorage.getItem("userName");
-            currentUser && ws.send(JSON.stringify({event: "enter-name", data: {userName: currentUser, userId}}));
-        }, 1000)
-    }
-
     function roomFull(){
         setIsRoomFull(true);
     }
@@ -145,10 +138,10 @@ const MeetingPage: React.FC = (): JSX.Element => {
 
     function raiseHand(){
         if(handRaised){
-            ws.send(JSON.stringify({event: "put-down", data: { userId, hostId }}));
+            wsMeeting?.send(JSON.stringify({event: "put-down", data: { userId, hostId }}));
         }
         else{
-            ws.send(JSON.stringify({event: "raise-hand", data: { userId, hostId }}));
+            wsMeeting?.send(JSON.stringify({event: "raise-hand", data: { userId, hostId }}));
         }
         setHandRaised(prev => !prev)
     }
@@ -160,9 +153,8 @@ const MeetingPage: React.FC = (): JSX.Element => {
     }, [timer])
 
     useEffect(() => {
-        ws.addEventListener('message', handleMessage)
-        getHostId()
-        insertHostUserName()
+        ws.addEventListener('message', handleMessage);
+        getHostId();
         return () => {
             localStorage.setItem('refresh', 'true');
             ws.removeEventListener("message", handleMessage);
@@ -193,7 +185,7 @@ const MeetingPage: React.FC = (): JSX.Element => {
             <div className="conf-container">
             <Timer timer= {timer} />
             
-            <Meeting ws = {ws} roomId={roomId} userId = {userId} userVideo={userVideo} myVideoOn={myVideoOn} myAudioOn={myAudioOn} hostId={hostId} startTimer={startTimer} roomFull={roomFull} raiseHandHandler={raiseHandHandler} putDownHandler={putDownHandler} userIdsToNames={userIdsToNames} setUserIdsToNames={setUserIdsToNames} setStream = {setStream}  />
+            <Meeting roomId={roomId} userId = {userId} userVideo={userVideo} myVideoOn={myVideoOn} myAudioOn={myAudioOn} hostId={hostId} startTimer={startTimer} roomFull={roomFull} raiseHandHandler={raiseHandHandler} putDownHandler={putDownHandler} userIdsToNames={userIdsToNames} setUserIdsToNames={setUserIdsToNames} setWsMeeting={setWsMeeting} />
 
             {hostId === userId && <div className="actions-container">
                 <h3>Notifications</h3>
